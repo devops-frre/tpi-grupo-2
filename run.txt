@@ -1,0 +1,10 @@
+1. docker run --network=tp-devops -p 5500:5432 -e POSTGRES_USER=devops -e POSTGRES_PASSWORD=devops2020 -e POSTGRES_DB=tp-devops --name postgres -it postgres
+2. cd webapp-back
+3. dotnet ef database update
+4. En appsettings.json setear la cadena de conexión: Host=postgres;Port=5432;Username=devops;Password=devops2020;Database=tp-devops;
+5. docker run --network=tp-devops -p 5501:80 --name webapp-back -it webapp-back
+6. docker run --network=tp-devops -p 5502:5000 --name webapp-front -it webapp-front
+7. http://localhost:5502
+
+---------------------------------------------------------------
+docker start postgres webapp-back webapp-front
