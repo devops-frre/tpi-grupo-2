@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Converters;
+using System;
 
 namespace GestiónDeMedicamentos
 {
@@ -21,16 +22,10 @@ namespace GestiónDeMedicamentos
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-            //    options.CheckConsentNeeded = context => false;
-            //    options.MinimumSameSitePolicy = SameSiteMode.None;
-            //});
 
             services.AddDbContextPool<PostgreContext>(options =>
             {
-                options.UseNpgsql(Configuration.GetConnectionString("PostgresDb"));
+                options.UseNpgsql($"Host={Environment.GetEnvironmentVariable("DB_HOST")};Port={Environment.GetEnvironmentVariable("DB_PORT")};Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};Password={Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")};Database={Environment.GetEnvironmentVariable("POSTGRES_DB")};");
             });
 
             services.AddScoped<IDrugRepository, DrugRepository>();
@@ -64,7 +59,6 @@ namespace GestiónDeMedicamentos
             }
 
             app.UseStaticFiles();
-            //app.UseCookiePolicy();
 
             app.UseCors("AllowOrigin"); //Debe estar antes de UseMvc
 
