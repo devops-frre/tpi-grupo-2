@@ -4,9 +4,10 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        kubernetesServer = "10.0.3.10"
-        kubernetesToken = credentials('kubernetes-token')
-        dockerhubUsername = "ianv97"
+        kubernetesServer = "https://10.0.2.10:6443"
+        kubernetesToken = credentials('kubectl')
+        dockerhubUsername = "thelinkin3000"
+        registryCredential = "dockerhub_id"
     }
 
     stages {
@@ -18,8 +19,10 @@ pipeline {
                         container('docker') {
                             script {
                                 webappBack = docker.build("${dockerhubUsername}/webapp-back:${BUILD_NUMBER}", "./webapp-back")
-                                webappBack.push()
-                                webappBack.push('latest')
+                                docker.withRegistry('', registryCredential) { 
+                                    webappBack.push()
+                                    webappBack.push('latest')
+                                }
                             }
                         }
                     }
@@ -30,8 +33,10 @@ pipeline {
                         container('docker') {
                             script {
                                 webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "./webapp-front")
-                                webappFront.push()
-                                webappFront.push('latest')
+                                docker.withRegistry('', registryCredential) {
+                                    webappFront.push()
+                                    webappFront.push('latest')
+                                }
                             }
                         }
                     }
@@ -44,19 +49,14 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent {
-                docker {
-                    image 'ianv97/kubectl'
-                }
-            }
             steps {
                 echo 'Deploying...'
-                // container('kubectl') {
-                //     script {
-                sh 'kubectl --server=${kubernetesServer} --token=${kubernetesToken} --insecure-skip-tls-verify get pods --all-namespaces'
-                sh 'kubectl --server=${kubernetesServer} --token=${kubernetesToken} --insecure-skip-tls-verify apply -f tp-devops.yml'
-                //     }
-                // }
+                container('kubectl') {
+                    script {
+                        sh 'kubectl --server=${kubernetesServer} --token=${kubernetesToken} --insecure-skip-tls-verify get pods --all-namespaces'
+                        sh 'kubectl --server=${kubernetesServer} --token=${kubernetesToken} --insecure-skip-tls-verify apply -f tp-devops.yml'
+                    }
+                }
             }
         }
     }
