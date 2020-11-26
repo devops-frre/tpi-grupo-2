@@ -98,7 +98,7 @@ spec:
       volumes:
         - name: postgres-persistent-storage
           hostPath:
-            path: /home/ian/postgres
+            path: /home/devops/postgres
             type: Directory
 ---
 apiVersion: v1
@@ -222,6 +222,6 @@ metadata:
   namespace: tp-devops
   name: endpoints
 data:
-  API_URL: 'http://localhost:3500/api/'
+  API_URL: 'http://localhost:27015/api/'
   DB_HOST: '10.110.110.10'
   DB_PORT: '5432'
