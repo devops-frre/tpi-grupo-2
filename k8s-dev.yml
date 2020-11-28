@@ -1,25 +1,25 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tp-devops
+  name: tp-devops-dev
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: ingress-webapp
 spec:
   rules:
     - http:
         paths:
-          - path: /api
+          - path: /dev/api
             pathType: Prefix
             backend:
               service:
                 name: service-back
                 port:
                   number: 80
-          - path: /
+          - path: /dev
             pathType: Prefix
             backend:
               service:
@@ -30,35 +30,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: tp-devops
-  name: postgres-nodeport
-spec:
-  type: NodePort
-  ports:
-    - name: postgres
-      protocol: TCP
-      nodePort: 30502
-      port: 5432
-      targetPort: 5432
-  selector:
-    app: postgres
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: postgres
 spec:
   ports:
     - port: 5432
   selector:
     app: postgres
-  clusterIP: 10.110.110.10
+  clusterIP: 10.10.10.10
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: postgres
 spec:
   selector:
@@ -105,7 +89,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: db-credentials
-  namespace: tp-devops
+  namespace: tp-devops-dev
 type: Opaque
 data:
   POSTGRES_DB: dHAtZGV2b3Bz
@@ -115,7 +99,7 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: service-back
 spec:
   ports:
@@ -128,7 +112,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: webapp-back
 spec:
   replicas: 2
@@ -141,7 +125,7 @@ spec:
         app: webapp-back
     spec:
       containers:
-        - image: thelinkin3000/webapp-back
+        - image: thelinkin3000/webapp-back:dev
           imagePullPolicy: Always
           name: webapp-back
           env:
@@ -177,7 +161,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: service-front
 spec:
   ports:
@@ -190,7 +174,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: webapp-front
 spec:
   replicas: 2
@@ -203,7 +187,7 @@ spec:
         app: webapp-front
     spec:
       containers:
-        - image: thelinkin3000/webapp-front
+        - image: thelinkin3000/webapp-front:dev
           imagePullPolicy: Always
           name: webapp-front
           env:
@@ -219,9 +203,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: tp-devops
+  namespace: tp-devops-dev
   name: endpoints
 data:
-  API_URL: 'http://localhost:3500/api/'
-  DB_HOST: '10.110.110.10'
+  API_URL: 'http://localhost:3500/dev/api/'
+  DB_HOST: '10.10.10.10'
   DB_PORT: '5432'
