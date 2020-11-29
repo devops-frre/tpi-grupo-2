@@ -7,8 +7,6 @@ using GestionDeMedicamentos.Services;
 
 namespace GestionDeMedicamentos.Controllers
 {
-    [Route("api/drogas")]
-    [ApiController]
     public class DrugsController : ControllerBase
     {
         private readonly IDrugRepository _drugRepository;
@@ -35,7 +33,7 @@ namespace GestionDeMedicamentos.Controllers
         }
 
         // GET: api/drogas/5
-        [HttpGet("{id:int}")]
+        [HttpGet]
         public async Task<IActionResult> GetDrug([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -45,7 +43,7 @@ namespace GestionDeMedicamentos.Controllers
 
             var drug = await _drugRepository.FindAsync(id);
 
-            if (drug == null)
+                if (drug == null)
             {
                 return NotFound();
             }
@@ -54,7 +52,7 @@ namespace GestionDeMedicamentos.Controllers
         }
 
         // PUT: api/drogas/5
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<IActionResult> PutDrug([FromRoute] int id, [FromBody] Drug drug)
         {
             if (!ModelState.IsValid)
@@ -104,7 +102,7 @@ namespace GestionDeMedicamentos.Controllers
         }
 
         // DELETE: api/drogas/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteDrug([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -123,7 +121,5 @@ namespace GestionDeMedicamentos.Controllers
 
             return Ok(drug);
         }
-
-
     }
 }

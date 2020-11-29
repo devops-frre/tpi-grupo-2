@@ -22,14 +22,12 @@ namespace GestiónDeMedicamentos
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddDbContextPool<PostgreContext>(options =>
             {
                 options.UseNpgsql($"Host={Environment.GetEnvironmentVariable("DB_HOST")};Port={Environment.GetEnvironmentVariable("DB_PORT")};Username={Environment.GetEnvironmentVariable("POSTGRES_USER")};Password={Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")};Database={Environment.GetEnvironmentVariable("POSTGRES_DB")};");
             });
 
             services.AddScoped<IDrugRepository, DrugRepository>();
-            services.AddScoped<IMedicineRepository, MedicineRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvc().AddJsonOptions(op =>
@@ -61,12 +59,21 @@ namespace GestiónDeMedicamentos
             app.UseStaticFiles();
 
             app.UseCors("AllowOrigin"); //Debe estar antes de UseMvc
-
+            var environment = Environment.GetEnvironmentVariable("HOST_ENV");
+            var template = "";
+            if(environment == "prod")
+            {
+                template = "prod/api/{controller}/{action=Index}/{id?}";
+            }
+            else if(environment == "dev")
+            {
+                template = "dev/api/{controller}/{action=Index}/{id?}";
+            }
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    template: template);
             });
         }
     }
